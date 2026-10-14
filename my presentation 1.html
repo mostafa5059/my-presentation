@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gesundes Essen – Präsentation</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: #0f1f17;
+      color: #1e3c2c;
+      line-height: 1.6;
+    }
+
+    /* ====== الحاوية الرئيسية ====== */
+    .presentation {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ====== كل قسم ====== */
+    .panel {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(80px) scale(0.95);
+      transition:
+        opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+        visibility 0.8s;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .panel.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+      z-index: 2;
+    }
+
+    .panel.exit-up {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-80px) scale(0.95);
+      z-index: 1;
+    }
+
+    .panel.exit-down {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(80px) scale(0.95);
+      z-index: 1;
+    }
+
+    /* ====== تقسيم القسم إلى نصفين ====== */
+    .panel-half {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 50px 45px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel-half.left {
+      background: linear-gradient(135deg, #f0f9f0 0%, #d8ecd8 100%);
+      text-align: left;
+      align-items: flex-start;
+    }
+
+    .panel-half.right {
+      background: linear-gradient(135deg, #ffffff 0%, #e8f5e8 100%);
+      text-align: left;
+      align-items: flex-start;
+      border-left: 3px solid #4caf50;
+    }
+
+    .panel-half.right::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 60%;
+      background: linear-gradient(to bottom, transparent, #4caf50, transparent);
+      border-radius: 4px;
+    }
+
+    .half-content {
+      max-width: 500px;
+      width: 100%;
+    }
+
+    /* تأثير دخول العناصر */
+    .panel.active .half-content > * {
+      animation: itemFadeUp 0.7s ease both;
+    }
+    .panel.active .half-content > *:nth-child(1) { animation-delay: 0.2s; }
+    .panel.active .half-content > *:nth-child(2) { animation-delay: 0.35s; }
+    .panel.active .half-content > *:nth-child(3) { animation-delay: 0.5s; }
+    .panel.active .half-content > *:nth-child(4) { animation-delay: 0.65s; }
+    .panel.active .half-content > *:nth-child(5) { animation-delay: 0.8s; }
+    .panel.active .half-content > *:nth-child(6) { animation-delay: 0.95s; }
+
+    @keyframes itemFadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ====== العناوين ====== */
+    h1 {
+      font-size: 3rem;
+      color: #1e3c2c;
+      margin-bottom: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    h1 .emoji-title {
+      display: block;
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-size: 2.2rem;
+      color: #1e3c2c;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+      position: relative;
+      padding-bottom: 18px;
+    }
+
+    h2::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 5px;
+      background: #4caf50;
+      border-radius: 4px;
+    }
+
+    .panel.active h2::after {
+      animation: lineGrow 0.8s ease 0.6s forwards;
+    }
+
+    @keyframes lineGrow { to { width: 90px; } }
+
+    /* ====== النص ====== */
+    p {
+      font-size: 1.2rem;
+      color: #2d3e2d;
+      margin-bottom: 1rem;
+      line-height: 1.7;
+    }
+
+    .lead {
+      font-size: 1.4rem;
+      color: #1e3c2c;
+      font-weight: 500;
+    }
+
+    /* ====== القوائم ====== */
+    ul { list-style: none; margin-top: 1rem; width: 100%; }
+
+    li {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: #2d3e2d;
+      margin-bottom: 0.9rem;
+      padding-left: 2.6rem;
+      position: relative;
+      transition: transform 0.25s ease, color 0.25s ease;
+    }
+
+    li:hover { transform: translateX(8px); color: #2e7d32; }
+
+    li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 28px;
+      height: 28px;
+      background: #4caf50;
+      color: white;
+      border-radius: 50%;
+      font-size: 0.9rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+    }
+
+    li:hover::before {
+      transform: scale(1.15) rotate(360deg);
+      background: #2e7d32;
+    }
+
+    .numbered-list { counter-reset: item; }
+    .numbered-list li { counter-increment: item; padding-left: 3rem; }
+    .numbered-list li::before {
+      content: counter(item);
+      background: linear-gradient(135deg, #4caf50, #2e7d32);
+      font-size: 0.95rem;
+    }
+
+    /* ====== الصور ====== */
+    .image-wrapper {
+      margin: 1.2rem 0;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      position: relative;
+    }
+
+    .image-wrapper img {
+      width: 100%;
+      height: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .image-wrapper:hover img {
+      transform: scale(1.05) rotate(1deg);
+    }
+
+    /* شبكة صور صغيرة */
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 1rem 0;
+      width: 100%;
+    }
+
+    .image-grid img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      transition: transform 0.4s ease;
+    }
+
+    .image-grid img:hover { transform: scale(1.08); }
+
+    /* ====== الإيموجي الكبير ====== */
+    .big-emoji {
+      font-size: 4rem;
+      text-align: center;
+      margin: 1rem 0;
+      letter-spacing: 12px;
+      line-height: 1.3;
+    }
+
+    .panel.active .big-emoji {
+      animation: emojiPop 0.8s ease 0.7s both;
+    }
+
+    @keyframes emojiPop {
+      0% { opacity: 0; transform: scale(0.4); }
+      70% { transform: scale(1.15); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* ====== بطاقة الاقتباس ====== */
+    .quote-card {
+      background: linear-gradient(135deg, #f1f9f1, #e0f2e0);
+      border-radius: 20px;
+      padding: 24px 28px;
+      margin: 1.2rem 0;
+      border-left: 6px solid #4caf50;
+      font-size: 1.2rem;
+      color: #1e3c2c;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .quote-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.15), transparent);
+    }
+
+    .panel.active .quote-card::before {
+      animation: shine 1.5s ease 0.8s;
+    }
+
+    @keyframes shine { to { left: 100%; } }
+
+    /* ====== شارة القسم ====== */
+    .panel-badge {
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      background: #1e3c2c;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      z-index: 10;
+    }
+
+    /* ====== فاصل بين النصفين ====== */
+    .divider-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #4caf50;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      z-index: 5;
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+      opacity: 0;
+      transition: opacity 0.5s ease 0.5s;
+    }
+
+    .panel.active .divider-label { opacity: 1; }
+
+    /* ====== المؤشر الجانبي ====== */
+    .side-nav {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .side-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(76, 175, 80, 0.25);
+      border: 2px solid #4caf50;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .side-dot.active {
+      background: #4caf50;
+      transform: scale(1.4);
+      box-shadow: 0 0 0 5px rgba(76, 175, 80, 0.2);
+    }
+
+    /* ====== شريط التقدم ====== */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #4caf50, #8bc34a);
+      width: 0%;
+      z-index: 200;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+    }
+
+    /* ====== رقم القسم ====== */
+    .slide-number {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: #1e3c2c;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      z-index: 100;
+      letter-spacing: 1px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .slide-number.bump { animation: numberBump 0.4s ease; }
+
+    @keyframes numberBump {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    /* ====== تلميح التمرير ====== */
+    .scroll-hint {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: #4caf50;
+      font-size: 0.85rem;
+      font-weight: 600;
+      z-index: 100;
+      animation: bounceDown 2s infinite;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      text-shadow: 0 2px 8px rgba(255, 255, 255, 0.8);
+    }
+
+    .scroll-hint.hidden { opacity: 0; }
+
+    @keyframes bounceDown {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(10px); }
+    }
+
+    .scroll-hint .arrow { font-size: 1.4rem; }
+
+    /* ====== الجوال ====== */
+    @media (max-width: 900px) {
+      .panel { flex-direction: column; }
+      .panel-half {
+        padding: 28px 22px;
+        min-height: 50vh;
+        justify-content: flex-start;
+        padding-top: 45px;
+      }
+      .panel-half.right { border-left: none; border-top: 3px solid #4caf50; }
+      .panel-half.right::before {
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 4px;
+        background: linear-gradient(to right, transparent, #4caf50, transparent);
+      }
+      h1 { font-size: 1.9rem; }
+      h1 .emoji-title { font-size: 2.3rem; }
+      h2 { font-size: 1.5rem; }
+      p, li { font-size: 0.95rem; }
+      .lead { font-size: 1.1rem; }
+      .big-emoji { font-size: 2.8rem; letter-spacing: 8px; }
+      .divider-label {
+        top: 50%;
+        transform: translate(-50%, -50%) rotate(-90deg);
+        font-size: 0.65rem;
+      }
+      .slide-number { bottom: 14px; right: 14px; font-size: 0.75rem; padding: 6px 12px; }
+      .side-nav { right: 10px; gap: 8px; }
+      .side-dot { width: 10px; height: 10px; }
+      .image-wrapper img { max-height: 200px; }
+      .image-grid img { height: 100px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar" id="progressBar"></div>
+  <nav class="side-nav" id="sideNav"></nav>
+  <div class="slide-number" id="slideNumber">1 / 8</div>
+  <div class="scroll-hint" id="scrollHint">
+    <span>Scrollen zum Navigieren</span>
+    <span class="arrow">↓</span>
+  </div>
+
+  <div class="presentation" id="presentation">
+
+    <!-- ============ الشريحة 1: العنوان ============ -->
+    <section class="panel active" data-index="0">
+      <span class="panel-badge">01 / 08</span>
+      <span class="divider-label">TEIL 1</span>
+      <div class="panel-half left">
+        <div class="half-content">
+          <h1>
+            <span class="emoji-title">🥗</span>
+            Gesundes Essen
+          </h1>
+          <p class="lead">Heute möchte ich über das Thema <strong>Gesundes Essen</strong> sprechen.</p>
+          <div class="image-wrapper">
+            <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80" alt="Gesunde Salatschüssel">
+          </div>
+        </div>
+      </div>
+      <div class="panel-half right">
+        <div class="half-content">
+          <p class="lead">Gesundes Essen ist sehr wichtig für unsere Gesundheit.</p>
+          <div class="image-grid">
+            <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&q=80" alt="Frische Früchte">
+            <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80" alt="Buntes Gemüse">
+          </div>
+          <div class="big-emoji">🍎🥦🍇</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ الشريحة 2: لماذا مهم؟ ============ -->
+    <section class="panel" data-index="1">
+      <span class="panel-badge">02 / 08</span>
+      <span class="divider-label">TEIL 2</span>
+      <div class="panel-half left">
+        <div class="half-content">
+          <h2>Warum ist gesundes Essen wichtig?</h2>
+          <div class="image-wrapper">
+            <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80" alt="Gesunder Salat">
+          </div>
+        </div>
+      </div>
+      <div class="panel-half right">
+        <div class="half-content">
+          <ul class="numbered-list">
+            <li>Ich finde, dass gesundes Essen unsere Gesundheit schützt.</li>
+            <li>Ich finde, dass gesundes Essen uns Energie gibt.</li>
+            <li>Ich finde, dass gesundes Essen uns hilft, aktiv zu sein.</li>
+          </ul>
+          <div class="image-wrapper">
+            <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80" alt="Gesunde Ernährung">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ الشريحة 3: الفوائد ============ -->
+    <section class="panel" data-index="2">
+      <span class="panel-badge">03 / 08</span>
+      <span class="divider-label">TEIL 3</span>
+      <div class="panel-half left">
+        <div class="half-content">
+          <h2>Die Vorteile von gesundem Essen</h2>
+          <ul class="numbered-list">
+            <li>Gesundes Essen stärkt unser Immunsystem.</li>
+            <li>Obst und Gemüse enthalten viele Vitamine.</li>
+          </ul>
+          <div class="image-wrapper">
+            <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=800&q=80" alt="Frische Früchte">
+          </div>
+        </div>
+      </div>
+      <div class="panel-half right">
+        <div class="half-content">
+          <p class="lead">Gesundes Essen ist gut für unseren Körper und unsere Gesundheit.</p>
+          <div class="image-grid">
+            <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80" alt="Gemüse">
+            <img src="https://images.unsplash.com/photo-1519996529931-28324d5a630e?w=400&q=80" alt="Vitamine">
+          </div>
+          <div class="big-emoji">💪🍊🥕</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ الشريحة 4: الأضرار ============ -->
+    <section class="panel" data-index="3">
+      <span class="panel-badge">04 / 08</span>
+      <span class="divider-label">TEIL 4</span>
+      <div class="panel-half left">
+        <div class="half-content">
+          <h2>Die Nachteile von ungesundem Essen</h2>
+          <ul class="numbered-list">
+            <li>Ungesundes Essen kann schlecht für unsere Gesundheit sein.</li>
+            <li>Zu viel Zucker und Salz sind auch nicht gut für unseren Körper.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel-half right">
+        <div class="half-content">
+          <p class="lead">Zu viel Fast Food und Süßigkeiten können zu Übergewicht führen.</p>
+          <div class="image-grid">
+            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80" alt="Burger">
+            <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80" alt="Pommes">
+          </div>
+          <p style="font-weight: 600; color: #2e7d32;">Deshalb sollten wir gesund essen.</p>
+          <div class="big-emoji">🍔🍟🍭</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ الشريحة 5: الأطعمة الصحية ============ -->
+    <section class="panel" data-index="4">
+      <span class="panel-badge">05 / 08</span>
+      <span class="divider-label">TEIL 5</span>
+      <div class="panel-half left">
+        <div class="half-content">
+          <h2>Gesunde Lebensmittel</h2>
+          <div class="image-wrapper">
+            <img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&q=80" alt="Gesunder Fisch">
+          </div>
+          <ul class="numbered-list">
+            <li>Gesunde Lebensmittel sind Obst, Gemüse, Fisch und Eier.</li>
+            <li>Sie enthalten viele Vitamine und sind gut für unsere Gesundheit.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel-half right">
+        <div class="half-content">
+          <p class="lead">Wir sollten auch genug Wasser trinken.</p>
+          <div class="image-grid">
+            <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&q=80" alt="Früchte">
+            <img src="https://images.unsplash.com/photo-1523362628745-0c100150b504?w=400&q=80" alt="Wasser">
+          </div>
+          <div class="big-emoji">🐟🥚🍎💧</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ الشريحة 6: الأطعمة غير الصحية ============ -->
+    <section class="panel" data-index="5">
+      <span class="panel-badge">06 / 08</span>
+      <span class="divider-label">TEIL 6</span>
+      <div class="panel-half left">
+        <div class="half-content">
+          <h2>Ungesunde Lebensmittel</h2>
+          <div class="image-wrapper">
+            <img src="https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?w=800&q=80" alt="Süßigkeiten und Chips">
+          </div>
+          <ul>
+            <li>Ungesunde Lebensmittel sind zum Beispiel Fast Food, Chips und Süßigkeiten.</li>
+            <li>Sie enthalten oft viel Fett, Zucker und Salz.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel-half right">
+        <div class="half-content">
+          <p class="lead">Wenn wir zu viel davon essen, können wir Übergewicht bekommen.</p>
+          <div class="image-grid">
+            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80" alt="Fast Food">
+            <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80" alt="Frittiertes">
+          </div>
+          <p style="font-weight: 600; color: #2e7d32;">Deshalb sollten wir diese Lebensmittel nicht zu oft essen.</p>
+          <div class="big-emoji">🍟🍬🧂</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ الشريحة 7: النصائح ============ -->
+    <section class="panel" data-index="6">
+      <span class="panel-badge">07 / 08</span>
+      <span class="divider-label">TEIL 7</span>
+      <div class="panel-half left">
+        <div class="half-content">
+          <h2>Tipps für eine gesunde Ernährung</h2>
+          <ul>
+            <li>Wir sollten jeden Tag Obst und Gemüse essen.</li>
+            <li>Wir sollten genug Wasser trinken.</li>
+            <li>Wir sollten nicht zu viel Zucker essen.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel-half right">
+        <div class="half-content">
+          <ul>
+            <li>Wir sollten auch regelmäßig Sport machen.</li>
+            <li>Eine gesunde Ernährung und Bewegung sind wichtig für unsere Gesundheit.</li>
+          </ul>
+          <div class="image-wrapper">
+            <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80" alt="Sport und Bewegung">
+          </div>
+          <div class="big-emoji">🏃‍♂️🍇💧</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ الشريحة 8: الخاتمة ============ -->
+    <section class="panel" data-index="7">
+      <span class="panel-badge">08 / 08</span>
+      <span class="divider-label">TEIL 8</span>
+      <div class="panel-half left">
+        <div class="half-content">
+          <h2>Schluss</h2>
+          <div class="quote-card">
+            <p>Zum Schluss möchte ich sagen, dass gesunde Ernährung sehr wichtig ist.</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel-half right">
+        <div class="half-content">
+          <div class="image-wrapper">
+            <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80" alt="Gesunder Salat">
+          </div>
+          <p class="lead" style="font-weight: 700; color: #2e7d32; font-size: 1.6rem;">Vielen Dank für eure Aufmerksamkeit! 🙏</p>
+          <div class="big-emoji">🌱🙏🌱</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    (function () {
+      const panels = document.querySelectorAll('.panel');
+      const sideNav = document.getElementById('sideNav');
+      const progressBar = document.getElementById('progressBar');
+      const slideNumber = document.getElementById('slideNumber');
+      const scrollHint = document.getElementById('scrollHint');
+      const totalPanels = panels.length;
+
+      let currentIndex = 0;
+      let isAnimating = false;
+
+      const COOLDOWN = 900;
+      const SCROLL_THRESHOLD = 20;
+
+      panels.forEach(function (_, i) {
+        const dot = document.createElement('div');
+        dot.classList.add('side-dot');
+        if (i === 0) dot.classList.add('active');
+        sideNav.appendChild(dot);
+      });
+
+      const sideDots = document.querySelectorAll('.side-dot');
+
+      function updateUI() {
+        sideDots.forEach(function (dot, i) {
+          dot.classList.toggle('active', i === currentIndex);
+        });
+
+        slideNumber.textContent = (currentIndex + 1) + ' / ' + totalPanels;
+        slideNumber.classList.remove('bump');
+        void slideNumber.offsetWidth;
+        slideNumber.classList.add('bump');
+
+        const progress = ((currentIndex + 1) / totalPanels) * 100;
+        progressBar.style.width = progress + '%';
+
+        if (currentIndex > 0) {
+          scrollHint.classList.add('hidden');
+        }
+      }
+
+      function goToPanel(newIndex, direction) {
+        if (isAnimating) return;
+        if (newIndex < 0 || newIndex >= totalPanels) return;
+        if (newIndex === currentIndex) return;
+
+        isAnimating = true;
+
+        const currentPanel = panels[currentIndex];
+        const nextPanel = panels[newIndex];
+
+        if (direction === 'down') {
+          currentPanel.classList.add('exit-up');
+          nextPanel.classList.remove('exit-down');
+        } else {
+          currentPanel.classList.add('exit-down');
+          nextPanel.classList.remove('exit-up');
+        }
+
+        currentPanel.classList.remove('active');
+        nextPanel.classList.add('active');
+
+        setTimeout(function () {
+          currentPanel.classList.remove('exit-up', 'exit-down');
+          isAnimating = false;
+        }, 800);
+
+        currentIndex = newIndex;
+        updateUI();
+      }
+
+      function handleWheel(e) {
+        e.preventDefault();
+        if (isAnimating) return;
+
+        const delta = e.deltaY;
+        if (Math.abs(delta) < SCROLL_THRESHOLD) return;
+
+        if (delta > 0) {
+          if (currentIndex < totalPanels - 1) {
+            goToPanel(currentIndex + 1, 'down');
+          } else {
+            bounceEffect('down');
+          }
+        } else {
+          if (currentIndex > 0) {
+            goToPanel(currentIndex - 1, 'up');
+          } else {
+            bounceEffect('up');
+          }
+        }
+      }
+
+      function bounceEffect(direction) {
+        const panel = panels[currentIndex];
+        const halves = panel.querySelectorAll('.panel-half');
+        halves.forEach(function (half) {
+          half.style.transition = 'transform 0.3s ease';
+          half.style.transform = direction === 'down'
+            ? 'translateY(-12px)'
+            : 'translateY(12px)';
+          setTimeout(function () {
+            half.style.transform = 'translateY(0)';
+          }, 200);
+          setTimeout(function () {
+            half.style.transition = '';
+          }, 500);
+        });
+      }
+
+      window.addEventListener('wheel', handleWheel, { passive: false });
+
+      let touchStartY = 0;
+      window.addEventListener('touchstart', function (e) {
+        touchStartY = e.changedTouches[0].screenY;
+      }, { passive: true });
+
+      window.addEventListener('touchend', function (e) {
+        const touchEndY = e.changedTouches[0].screenY;
+        const diff = touchStartY - touchEndY;
+        if (Math.abs(diff) < 50) return;
+        if (isAnimating) return;
+
+        if (diff > 0 && currentIndex < totalPanels - 1) {
+          goToPanel(currentIndex + 1, 'down');
+        } else if (diff < 0 && currentIndex > 0) {
+          goToPanel(currentIndex - 1, 'up');
+        }
+      }, { passive: true });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+          e.preventDefault();
+          if (currentIndex < totalPanels - 1) goToPanel(currentIndex + 1, 'down');
+        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+          e.preventDefault();
+          if (currentIndex > 0) goToPanel(currentIndex - 1, 'up');
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          goToPanel(0, 'up');
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          goToPanel(totalPanels - 1, 'down');
+        }
+      });
+
+      updateUI();
+    })();
+  </script>
+</body>
+</html>
